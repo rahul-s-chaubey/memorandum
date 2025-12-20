@@ -10,6 +10,7 @@ public class CommitteeDTO
 	private LocalDate createdOn;
 	private String updatedBy;
 	private LocalDate updatedOn;
+	private Boolean isActive;
 	public Long getCommitteeId() {
 		return committeeId;
 	}
@@ -46,6 +47,14 @@ public class CommitteeDTO
 	public void setUpdatedOn(LocalDate updatedOn) {
 		this.updatedOn = updatedOn;
 	}
+	public Boolean getIsActive() {
+	    return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+	    this.isActive = isActive;
+	}
+
 	
 	
 }

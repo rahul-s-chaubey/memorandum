@@ -29,6 +29,17 @@ public class DepartmentEntity
 	private String updatedBy;
 	@Column(name = "updated_at" )
 	private LocalDate updatedOn;
+	@Column(name = "is_active")
+	private Boolean isActive;
+
+	public Boolean getIsActive() {
+	    return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+	    this.isActive = isActive;
+	}
+
 	public Long getDepartmentId() {
 		return departmentId;
 	}

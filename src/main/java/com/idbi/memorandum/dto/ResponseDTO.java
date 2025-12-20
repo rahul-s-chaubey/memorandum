@@ -28,7 +28,6 @@ public class ResponseDTO  implements Serializable
 		this.status = status;
 	}
 	
-	
-	
+
 	
 }

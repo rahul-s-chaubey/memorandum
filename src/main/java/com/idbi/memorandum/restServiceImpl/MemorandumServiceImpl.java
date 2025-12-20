@@ -20,6 +20,7 @@ public class MemorandumServiceImpl implements MemorandumRestService
 {
 	@Autowired private MemorandumRepository memorandumRepository;
 	
+	
 	@Autowired private ReferenceNumberService referenceNumberService;
 	
 	@Override
