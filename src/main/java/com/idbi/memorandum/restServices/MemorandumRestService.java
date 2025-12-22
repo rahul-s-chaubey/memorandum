@@ -1,5 +1,7 @@
 package com.idbi.memorandum.restServices;
 
+import java.util.List;
+
 import com.idbi.memorandum.dto.MemorandumDTO;
 import com.idbi.memorandum.dto.ResponseDTO;
 import com.idbi.memorandum.dto.SearchFilterDTO;
@@ -14,6 +16,9 @@ public interface MemorandumRestService
 	public ResponseDTO updateMemorandum(MemorandumDTO memorandumDTO);
 	
 	public MemorandumDTO getMemorandum(SearchFilterDTO serchFilterDTO);
+	
+	public List<MemorandumDTO> getMemorandumList(SearchFilterDTO searchFilterDTO);
+
 	
 //Pagination is pending	
 }

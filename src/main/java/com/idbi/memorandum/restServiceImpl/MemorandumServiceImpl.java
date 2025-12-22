@@ -1,6 +1,7 @@
 package com.idbi.memorandum.restServiceImpl;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import com.idbi.memorandum.restServices.MemorandumRestService;
 import com.idbi.memorandum.restServices.ReferenceNumberService;
 
 @Service
+
 public class MemorandumServiceImpl implements MemorandumRestService
 {
 	@Autowired private MemorandumRepository memorandumRepository;
@@ -127,11 +129,35 @@ public class MemorandumServiceImpl implements MemorandumRestService
 	}
 
 	@Override
-	public MemorandumDTO getMemorandum(SearchFilterDTO serchFilterDTO) 
-	{
-		
-		
-			return null;
+	public MemorandumDTO getMemorandum(SearchFilterDTO serchFilterDTO) {
+
+	    MemorandumEntity entity =
+	            memorandumRepository.getMemorandumById(
+	                    Long.valueOf(serchFilterDTO.getId()));
+
+	    if (entity == null) {
+	        throw new RuntimeException("Memorandum not found");
+	    }
+
+	    MemorandumDTO dto = new MemorandumDTO();
+	    BeanUtils.copyProperties(entity, dto);
+
+	    return dto;
 	}
+
+	
+	@Override
+	public List<MemorandumDTO> getMemorandumList(SearchFilterDTO searchFilterDTO) {
+
+	    return memorandumRepository.findByIsActiveTrue()
+	            .stream()
+	            .map(entity -> {
+	                MemorandumDTO dto = new MemorandumDTO();
+	                BeanUtils.copyProperties(entity, dto);
+	                return dto;
+	            })
+	            .toList();
+	}
+
 
 }

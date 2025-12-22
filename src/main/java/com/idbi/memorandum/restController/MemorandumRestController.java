@@ -44,14 +44,23 @@ public class MemorandumRestController
 	}
 	
 	@PostMapping(value = "/criteria/list")
-	public ResponseEntity<List<MemorandumDTO>> getMemorandumList(@RequestBody SearchFilterDTO serachFilterDTO)
-	{
-		return null;
+	public ResponseEntity<List<MemorandumDTO>> getMemorandumList(
+	        @RequestBody SearchFilterDTO serachFilterDTO) {
+
+	    List<MemorandumDTO> list =
+	            memorandumService.getMemorandumList(serachFilterDTO);
+
+	    return ResponseEntity.ok(list);
 	}
-	
+
 	@PostMapping(value = "/criteria/detail")
-	public ResponseEntity<MemorandumDTO> getMemorandumById(@RequestBody SearchFilterDTO serachFilterDTO)
-	{
-		return null;
+	public ResponseEntity<MemorandumDTO> getMemorandumById(
+	        @RequestBody SearchFilterDTO serachFilterDTO) {
+
+	    MemorandumDTO dto =
+	            memorandumService.getMemorandum(serachFilterDTO);
+
+	    return ResponseEntity.ok(dto);
 	}
+
 }
