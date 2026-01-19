@@ -18,19 +18,21 @@ public class RsaCryptoUtil {
 
     public String decrypt(String encryptedText) {
         try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
+            //Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
+        	Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 
-            OAEPParameterSpec oaepParams = new OAEPParameterSpec(
-                    "SHA-256",               // message digest
-                    "MGF1",                  // mask generation
-                    MGF1ParameterSpec.SHA256,// MGF digest
-                    PSource.PSpecified.DEFAULT
-            );
+
+//            OAEPParameterSpec oaepParams = new OAEPParameterSpec(
+//                    "SHA-256",               // message digest
+//                    "MGF1",                  // mask generation
+//                    MGF1ParameterSpec.SHA256,// MGF digest
+//                    PSource.PSpecified.DEFAULT
+//            );
 
             cipher.init(
                     Cipher.DECRYPT_MODE,
-                    rsaKeyUtil.getPrivateKey(),
-                    oaepParams
+                    rsaKeyUtil.getPrivateKey()
+                    //oaepParams
             );
 
             byte[] decodedBytes = Base64.getDecoder().decode(encryptedText);

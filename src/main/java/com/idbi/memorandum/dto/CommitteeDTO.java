@@ -11,6 +11,9 @@ public class CommitteeDTO
 	private String updatedBy;
 	private LocalDate updatedOn;
 	private Boolean isActive;
+	private String committeeCode;
+	private String description;
+
 	public Long getCommitteeId() {
 		return committeeId;
 	}
@@ -55,6 +58,19 @@ public class CommitteeDTO
 	    this.isActive = isActive;
 	}
 
-	
+	public String getCommitteeCode() {
+	    return committeeCode;
+	}
+	public void setCommitteeCode(String committeeCode) {
+	    this.committeeCode = committeeCode;
+	}
+
+	public String getDescription() {
+	    return description;
+	}
+	public void setDescription(String description) {
+	    this.description = description;
+	}
+
 	
 }

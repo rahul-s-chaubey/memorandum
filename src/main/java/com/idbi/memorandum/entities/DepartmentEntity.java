@@ -21,6 +21,8 @@ public class DepartmentEntity
 	private Long departmentId;
 	@Column(name = "department_name" )
 	private String departmentName;
+	@Column(name = "department_code")
+	private String departmentCode;
 	@Column(name = "created_by" )
 	private String createdBy; //ein
 	@Column(name = "created_at" )
@@ -51,6 +53,13 @@ public class DepartmentEntity
 	}
 	public void setDepartmentName(String departmentName) {
 		this.departmentName = departmentName;
+	}
+	public String getDepartmentCode() {
+	    return departmentCode;
+	}
+
+	public void setDepartmentCode(String departmentCode) {
+	    this.departmentCode = departmentCode;
 	}
 	public String getCreatedBy() {
 		return createdBy;

@@ -31,6 +31,12 @@ public class CommitteeEntity
 	private LocalDate updatedOn;
 	@Column(name = "is_active")
 	private Boolean isActive;
+	@Column(name="committee_code")
+	private String committeeCode;
+
+	@Column(name="description")
+	private String description;
+
 	public Long getCommitteeId() {
 		return committeeId;
 	}
@@ -73,6 +79,19 @@ public class CommitteeEntity
 
 	public void setIsActive(Boolean isActive) {
 	    this.isActive = isActive;
+	}
+	public String getCommitteeCode() {
+	    return committeeCode;
+	}
+	public void setCommitteeCode(String committeeCode) {
+	    this.committeeCode = committeeCode;
+	}
+
+	public String getDescription() {
+	    return description;
+	}
+	public void setDescription(String description) {
+	    this.description = description;
 	}
 
 	

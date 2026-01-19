@@ -15,15 +15,23 @@ import com.idbi.memorandum.entities.MemorandumEntity;
 import com.idbi.memorandum.repositories.MemorandumRepository;
 import com.idbi.memorandum.restServices.MemorandumRestService;
 import com.idbi.memorandum.restServices.ReferenceNumberService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+
 
 @Service
 
 public class MemorandumServiceImpl implements MemorandumRestService
-{
+{   
+	
 	@Autowired private MemorandumRepository memorandumRepository;
 	
 	
 	@Autowired private ReferenceNumberService referenceNumberService;
+	
+	 @PersistenceContext
+	 private EntityManager entityManager;
 	
 	@Override
 	public ResponseDTO createMemorandum(MemorandumDTO memorandumDTO) 
@@ -54,7 +62,7 @@ public class MemorandumServiceImpl implements MemorandumRestService
 			entity.setDepartmentId(memorandumDTO.getDepartmentId());
 			entity.setDepartmentName(null);
 			entity.setCommitteeId(memorandumDTO.getCommitteeId());
-			entity.setCommitteeName(null);
+			//entity.setCommitteeName(null);
 			
 //			entity.setReferenceNo(referenceNumberService.generateReferenceNumber(memorandumDTO.getDepartmentId(), 
 //																				memorandumDTO.getDepartmentName(), 
@@ -113,11 +121,7 @@ public class MemorandumServiceImpl implements MemorandumRestService
 	{
 		ResponseDTO responseDTO = null;
 		MemorandumEntity entity = memorandumRepository.getMemorandumById(memorandumDTO.getMemorandumId());
-		if(entity.getStatus().equalsIgnoreCase("Pending") || entity.getStatus().equalsIgnoreCase("Saved as Draft"))
-		{
-			BeanUtils.copyProperties(memorandumDTO, entity);
-			memorandumRepository.save(entity);
-		}
+		BeanUtils.copyProperties(memorandumDTO, entity);
 		memorandumRepository.save(entity);
 		responseDTO = new ResponseDTO ();
 		responseDTO.setMemorandumNumber(entity.getReferenceNo());
@@ -147,17 +151,59 @@ public class MemorandumServiceImpl implements MemorandumRestService
 
 	
 	@Override
-	public List<MemorandumDTO> getMemorandumList(SearchFilterDTO searchFilterDTO) {
+	public List<MemorandumDTO> getMemorandumList(SearchFilterDTO dto) {
 
-	    return memorandumRepository.findByIsActiveTrue()
+	    String jpql = "FROM MemorandumEntity e WHERE e.isActive = true";
+
+	    if (dto.getMemorandumTo() != null)
+	        jpql += " AND e.memorandumTo = :memorandumTo";
+
+	    if (dto.getCommitteeName() != null)
+	        jpql += " AND e.committeeName = :committeeName";
+
+	    if (dto.getCheckerEin() != null)
+	        jpql += " AND e.checkerEIN = :checkerEin";
+
+	    if (dto.getStatus() != null)
+	        jpql += " AND e.status = :status";
+
+	    if (dto.getTitle() != null)
+	        jpql += " AND LOWER(e.title) LIKE :title";
+
+	    if (dto.getReferenceNo() != null)
+	        jpql += " AND e.referenceNo LIKE :referenceNo";
+
+	    TypedQuery<MemorandumEntity> query =
+	            entityManager.createQuery(jpql, MemorandumEntity.class);
+
+	    if (dto.getMemorandumTo() != null)
+	        query.setParameter("memorandumTo", dto.getMemorandumTo());
+
+	    if (dto.getCommitteeName() != null)
+	        query.setParameter("committeeName", dto.getCommitteeName());
+
+	    if (dto.getCheckerEin() != null)
+	        query.setParameter("checkerEin", dto.getCheckerEin());
+
+	    if (dto.getStatus() != null)
+	        query.setParameter("status", dto.getStatus());
+
+	    if (dto.getTitle() != null)
+	        query.setParameter("title", "%" + dto.getTitle().toLowerCase() + "%");
+
+	    if (dto.getReferenceNo() != null)
+	        query.setParameter("referenceNo", "%" + dto.getReferenceNo() + "%");
+
+	    return query.getResultList()
 	            .stream()
 	            .map(entity -> {
-	                MemorandumDTO dto = new MemorandumDTO();
-	                BeanUtils.copyProperties(entity, dto);
-	                return dto;
+	                MemorandumDTO m = new MemorandumDTO();
+	                BeanUtils.copyProperties(entity, m);
+	                return m;
 	            })
 	            .toList();
 	}
+
 
 
 }

@@ -47,8 +47,14 @@ public class MemorandumRestController
 	public ResponseEntity<List<MemorandumDTO>> getMemorandumList(
 	        @RequestBody SearchFilterDTO serachFilterDTO) {
 
-	    List<MemorandumDTO> list =
-	            memorandumService.getMemorandumList(serachFilterDTO);
+	    List<MemorandumDTO> list = null;
+		try {
+			list = memorandumService.getMemorandumList(serachFilterDTO);
+		} catch (Exception e) {
+			// TODO: handle exception
+			
+			e.printStackTrace();
+		}
 
 	    return ResponseEntity.ok(list);
 	}

@@ -10,6 +10,9 @@ import com.idbi.memorandum.entities.EmpEntity;
 import com.idbi.memorandum.repositories.EmpRepository;
 import com.idbi.memorandum.utility.JwtTokenUtil;
 import com.idbi.memorandum.utility.RsaCryptoUtil;
+import java.util.List;
+import java.util.stream.Collectors;
+import com.idbi.memorandum.dto.CheckerDTO;
 
 @Service
 public class EmpAuthService {
@@ -37,10 +40,7 @@ public class EmpAuthService {
 
         String token = jwtTokenUtil.generateToken(emp);
 
-        return new EmpLoginResponseDto(
-                "Login successful",
-                token
-        );
+        return new EmpLoginResponseDto(token);
 
 
     }
@@ -70,10 +70,22 @@ public class EmpAuthService {
 
         String token = jwtTokenUtil.generateToken(emp);
 
-        return new EmpLoginResponseDto(
-                "Login successful",
-                token
-        );
+        return new EmpLoginResponseDto(token);
 
+
+    }
+    
+    public List<CheckerDTO> getEligibleCheckers() {
+
+        return empRepository.findCheckersGradeCAndAbove()
+                .stream()
+                .map(e -> {
+                    CheckerDTO dto = new CheckerDTO();
+                    dto.setEin(e.getEin());
+                    dto.setFullName(e.getFullNameTitle());
+                    dto.setGrade(e.getGrade());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }

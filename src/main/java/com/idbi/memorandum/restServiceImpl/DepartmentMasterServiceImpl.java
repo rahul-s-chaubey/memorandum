@@ -49,6 +49,7 @@ public class DepartmentMasterServiceImpl implements DepartmentMasterService {
 
         DepartmentEntity entity = new DepartmentEntity();
         entity.setDepartmentName(departmentDTO.getDepartmentName().trim());
+        entity.setDepartmentCode(departmentDTO.getDepartmentCode());
         entity.setCreatedBy(departmentDTO.getCreatedBy());
         entity.setCreatedOn(LocalDate.now());
         entity.setIsActive(true);   // ✅ default active
@@ -75,6 +76,7 @@ public class DepartmentMasterServiceImpl implements DepartmentMasterService {
         if (departmentDTO.getDepartmentName() != null &&
             !departmentDTO.getDepartmentName().trim().isEmpty()) {
             entity.setDepartmentName(departmentDTO.getDepartmentName().trim());
+            entity.setDepartmentCode(departmentDTO.getDepartmentCode());
         }
 
         if (departmentDTO.getIsActive() != null) {
@@ -111,6 +113,7 @@ public class DepartmentMasterServiceImpl implements DepartmentMasterService {
                     DepartmentDTO dto = new DepartmentDTO();
                     dto.setDepartmentId(entity.getDepartmentId());
                     dto.setDepartmentName(entity.getDepartmentName());
+                    dto.setDepartmentCode(entity.getDepartmentCode());
                     dto.setCreatedBy(entity.getCreatedBy());
                     return dto;
                 })
@@ -128,6 +131,7 @@ public class DepartmentMasterServiceImpl implements DepartmentMasterService {
         DepartmentDTO dto = new DepartmentDTO();
         dto.setDepartmentId(entity.getDepartmentId());
         dto.setDepartmentName(entity.getDepartmentName());
+        dto.setDepartmentCode(entity.getDepartmentCode());
         dto.setCreatedBy(entity.getCreatedBy());
 
         return dto;

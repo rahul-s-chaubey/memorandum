@@ -13,63 +13,51 @@ import com.idbi.memorandum.entities.CommitteeEntity;
 import com.idbi.memorandum.repositories.CommitteeRepository;
 import com.idbi.memorandum.restServices.CommitteeMasterService;
 
-//@Service
-//public class CommitteeMasterServiceImpl implements CommitteeMasterService
-//{
-//
-//	@Override
-//	public ResponseDTO createCommittee(CommitteeDTO committeeDTO) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//	
-//}
-
 @Service
 public class CommitteeMasterServiceImpl implements CommitteeMasterService {
 
     @Autowired
     private CommitteeRepository committeeRepository;
 
-    // CREATE
+    // ================= CREATE =================
     @Override
     public ResponseDTO createCommittee(CommitteeDTO committeeDTO) {
-    	
-    	// NULL / EMPTY CHECK
+
+        ResponseDTO responseDTO = new ResponseDTO();
+
+        // NULL / EMPTY CHECK
         if (committeeDTO.getCommitteeName() == null ||
             committeeDTO.getCommitteeName().trim().isEmpty()) {
 
-            ResponseDTO responseDTO = new ResponseDTO();
             responseDTO.setStatus("FAILURE");
             responseDTO.setMessage("Committee name cannot be empty");
             responseDTO.setMemorandumNumber(null);
             return responseDTO;
         }
-        
-     // DUPLICATE CHECK
-    	boolean exists = committeeRepository
-    	        .existsByCommitteeName(committeeDTO.getCommitteeName());
 
-    	if (exists) {
-    	    ResponseDTO responseDTO = new ResponseDTO();
-    	    responseDTO.setStatus("FAILURE");
-    	    responseDTO.setMessage("Committee already exists");
-    	    responseDTO.setMemorandumNumber(null);
-    	    return responseDTO;
-    	}
-    	
-    	// SAVE
+        // DUPLICATE CHECK (by name)
+        boolean exists = committeeRepository
+                .existsByCommitteeName(committeeDTO.getCommitteeName().trim());
+
+        if (exists) {
+            responseDTO.setStatus("FAILURE");
+            responseDTO.setMessage("Committee already exists");
+            responseDTO.setMemorandumNumber(null);
+            return responseDTO;
+        }
+
+        // SAVE
         CommitteeEntity entity = new CommitteeEntity();
-        entity.setCommitteeName(committeeDTO.getCommitteeName());
+        entity.setCommitteeName(committeeDTO.getCommitteeName().trim());
+        entity.setCommitteeCode(committeeDTO.getCommitteeCode());     // ✅ NEW
+        entity.setDescription(committeeDTO.getDescription());        // ✅ NEW
         entity.setCreatedBy(committeeDTO.getCreatedBy());
         entity.setCreatedOn(LocalDate.now());
         entity.setIsActive(true);
 
-
         CommitteeEntity savedEntity = committeeRepository.save(entity);
 
-        ResponseDTO responseDTO = new ResponseDTO();
-        responseDTO.setStatus("200");
+        responseDTO.setStatus("SUCCESS");
         responseDTO.setMessage("Committee created successfully");
         responseDTO.setMemorandumNumber(
                 String.valueOf(savedEntity.getCommitteeId())
@@ -78,7 +66,7 @@ public class CommitteeMasterServiceImpl implements CommitteeMasterService {
         return responseDTO;
     }
 
-    // UPDATE
+    // ================= UPDATE / DELETE =================
     @Override
     public ResponseDTO updateCommittee(CommitteeDTO committeeDTO) {
 
@@ -86,13 +74,19 @@ public class CommitteeMasterServiceImpl implements CommitteeMasterService {
                 .findById(committeeDTO.getCommitteeId())
                 .orElseThrow(() -> new RuntimeException("Committee not found"));
 
-        // Update name only if provided
         if (committeeDTO.getCommitteeName() != null &&
             !committeeDTO.getCommitteeName().trim().isEmpty()) {
             entity.setCommitteeName(committeeDTO.getCommitteeName().trim());
         }
 
-        // Soft delete / activate
+        if (committeeDTO.getCommitteeCode() != null) {
+            entity.setCommitteeCode(committeeDTO.getCommitteeCode());   // ✅ NEW
+        }
+
+        if (committeeDTO.getDescription() != null) {
+            entity.setDescription(committeeDTO.getDescription());       // ✅ NEW
+        }
+
         if (committeeDTO.getIsActive() != null) {
             entity.setIsActive(committeeDTO.getIsActive());
         }
@@ -117,24 +111,27 @@ public class CommitteeMasterServiceImpl implements CommitteeMasterService {
 
         return responseDTO;
     }
-    // LIST
+
+    // ================= LIST =================
     @Override
     public List<CommitteeDTO> getCommitteeList(SearchFilterDTO searchFilterDTO) {
 
         return committeeRepository.findByIsActiveTrue()
-
                 .stream()
                 .map(entity -> {
                     CommitteeDTO dto = new CommitteeDTO();
                     dto.setCommitteeId(entity.getCommitteeId());
                     dto.setCommitteeName(entity.getCommitteeName());
+                    dto.setCommitteeCode(entity.getCommitteeCode());   // ✅ NEW
+                    dto.setDescription(entity.getDescription());      // ✅ NEW
+                    dto.setIsActive(entity.getIsActive());
                     dto.setCreatedBy(entity.getCreatedBy());
                     return dto;
                 })
                 .toList();
     }
 
-    // DETAIL
+    // ================= DETAIL =================
     @Override
     public CommitteeDTO getCommitteeById(SearchFilterDTO searchFilterDTO) {
 
@@ -145,6 +142,9 @@ public class CommitteeMasterServiceImpl implements CommitteeMasterService {
         CommitteeDTO dto = new CommitteeDTO();
         dto.setCommitteeId(entity.getCommitteeId());
         dto.setCommitteeName(entity.getCommitteeName());
+        dto.setCommitteeCode(entity.getCommitteeCode());   // ✅ NEW
+        dto.setDescription(entity.getDescription());      // ✅ NEW
+        dto.setIsActive(entity.getIsActive());
         dto.setCreatedBy(entity.getCreatedBy());
 
         return dto;

@@ -5,7 +5,8 @@ import java.time.LocalDate;
 public class DepartmentDTO {
 
     private Long departmentId;          
-    private String departmentName;      
+    private String departmentName;     
+    private String departmentCode;
     private String createdBy;
     private LocalDate createdOn;
     private String updatedBy;
@@ -24,6 +25,13 @@ public class DepartmentDTO {
     }
     public void setDepartmentName(String departmentName) {
         this.departmentName = departmentName;
+    }
+    public String getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
     }
 
     public String getCreatedBy() {

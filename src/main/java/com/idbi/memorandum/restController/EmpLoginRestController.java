@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.idbi.memorandum.dto.EmpLoginRequestDto;
 import com.idbi.memorandum.dto.EncryptedLoginRequestDto;
 import com.idbi.memorandum.restServices.EmpAuthService;
+import org.springframework.web.bind.annotation.GetMapping;
+
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/emp/auth")
@@ -55,4 +57,9 @@ public class EmpLoginRestController {
         }
 
     }
+    @GetMapping("/checkers")
+    public ResponseEntity<?> getCheckers() {
+        return ResponseEntity.ok(empAuthService.getEligibleCheckers());
+    }
+
 }
