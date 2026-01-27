@@ -41,7 +41,7 @@ public class MemorandumServiceImpl implements MemorandumRestService
 		//try 
 		//{
 			entity = new MemorandumEntity();
-			entity.setCheckerEIN(memorandumDTO.getCheckerEIN());
+			//entity.setCheckerEIN(memorandumDTO.getCheckerEIN());
 			entity.setCommitteeName(memorandumDTO.getCommitteeName());
 			
 			entity.setCommonOutwardNumber(memorandumDTO.getCommonOutwardNumber());
@@ -60,7 +60,7 @@ public class MemorandumServiceImpl implements MemorandumRestService
 			entity.setCheckerName(memorandumDTO.getCheckerName());
 			entity.setIsActive(true);
 			entity.setDepartmentId(memorandumDTO.getDepartmentId());
-			entity.setDepartmentName(null);
+			entity.setDepartmentName(memorandumDTO.getDepartmentName());
 			entity.setCommitteeId(memorandumDTO.getCommitteeId());
 			//entity.setCommitteeName(null);
 			
@@ -96,7 +96,7 @@ public class MemorandumServiceImpl implements MemorandumRestService
 	{
 		ResponseDTO responseDTO = null;
 		MemorandumEntity entity = memorandumRepository.getMemorandumById(workflowDTO.getMemorandumId());
-		if(workflowDTO.getStatus().equalsIgnoreCase("Approved"))
+		if(workflowDTO.getStatus().equalsIgnoreCase("APPROVED"))
 		{
 			entity.setReferenceNo(referenceNumberService.generateReferenceNumber(entity.getDepartmentId(), 
 					entity.getDepartmentName(), 
@@ -160,6 +160,9 @@ public class MemorandumServiceImpl implements MemorandumRestService
 
 	    if (dto.getCommitteeName() != null)
 	        jpql += " AND e.committeeName = :committeeName";
+	    if (dto.getDepartmentName() != null)
+	        jpql += " AND e.departmentName = :departmentName";
+	    
 
 	    if (dto.getCheckerEin() != null)
 	        jpql += " AND e.checkerEIN = :checkerEin";
@@ -181,6 +184,8 @@ public class MemorandumServiceImpl implements MemorandumRestService
 
 	    if (dto.getCommitteeName() != null)
 	        query.setParameter("committeeName", dto.getCommitteeName());
+	    if (dto.getDepartmentName() != null)
+	        query.setParameter("departmentName", dto.getDepartmentName());
 
 	    if (dto.getCheckerEin() != null)
 	        query.setParameter("checkerEin", dto.getCheckerEin());

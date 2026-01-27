@@ -115,6 +115,7 @@ public class DepartmentMasterServiceImpl implements DepartmentMasterService {
                     dto.setDepartmentName(entity.getDepartmentName());
                     dto.setDepartmentCode(entity.getDepartmentCode());
                     dto.setCreatedBy(entity.getCreatedBy());
+                    dto.setIsActive(entity.getIsActive());
                     return dto;
                 })
                 .toList();
@@ -133,6 +134,7 @@ public class DepartmentMasterServiceImpl implements DepartmentMasterService {
         dto.setDepartmentName(entity.getDepartmentName());
         dto.setDepartmentCode(entity.getDepartmentCode());
         dto.setCreatedBy(entity.getCreatedBy());
+        dto.setIsActive(entity.getIsActive());
 
         return dto;
     }

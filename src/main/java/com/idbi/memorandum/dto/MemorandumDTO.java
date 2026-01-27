@@ -51,6 +51,8 @@ public class MemorandumDTO implements Serializable
 	private String departmentName;
 	
 	private Long departmentId;
+	
+	private String rejectionRemarks;
 
 	public Long getMemorandumId() {
 		return memorandumId;
@@ -222,6 +224,14 @@ public class MemorandumDTO implements Serializable
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public String getRejectionRemarks() {
+		return rejectionRemarks;
+	}
+
+	public void setRejectionRemarks(String rejectionRemarks) {
+		this.rejectionRemarks = rejectionRemarks;
 	}
 	
 	
