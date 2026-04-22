@@ -2,6 +2,7 @@ package com.idbi.memorandum.dto;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 
@@ -10,6 +11,8 @@ public class MemorandumDTO implements Serializable
 
 	 
 	private static final long serialVersionUID = 1L;
+	private String documentType;
+	
 	private Long memorandumId;
 	
 	private String memorandumTo;
@@ -24,6 +27,7 @@ public class MemorandumDTO implements Serializable
 	
 	private String committeeName;
 	
+	@JsonProperty("checkerEin")
 	private String checkerEIN;
 	
 	private String checkerName;
@@ -36,6 +40,7 @@ public class MemorandumDTO implements Serializable
 	
 	private String remarks;
 	
+	@JsonProperty("makerEIN")
 	private String makerEIN;
 	
 	private String makerName;
@@ -53,6 +58,19 @@ public class MemorandumDTO implements Serializable
 	private Long departmentId;
 	
 	private String rejectionRemarks;
+	
+	private LocalDate dateOfDocument;
+	
+	private String letterSentTo;
+	
+	
+	public String getDocumentType() {
+	    return documentType;
+	}
+
+	public void setDocumentType(String documentType) {
+	    this.documentType = documentType;
+	}
 
 	public Long getMemorandumId() {
 		return memorandumId;
@@ -232,6 +250,22 @@ public class MemorandumDTO implements Serializable
 
 	public void setRejectionRemarks(String rejectionRemarks) {
 		this.rejectionRemarks = rejectionRemarks;
+	}
+
+	public LocalDate getDateOfDocument() {
+		return dateOfDocument;
+	}
+
+	public void setDateOfDocument(LocalDate dateOfDocument) {
+		this.dateOfDocument = dateOfDocument;
+	}
+
+	public String getLetterSentTo() {
+		return letterSentTo;
+	}
+
+	public void setLetterSentTo(String letterSentTo) {
+		this.letterSentTo = letterSentTo;
 	}
 	
 	

@@ -23,86 +23,81 @@ import jakarta.persistence.TypedQuery;
 @Service
 
 public class MemorandumServiceImpl implements MemorandumRestService
-{   
-	
+{
+
 	@Autowired private MemorandumRepository memorandumRepository;
-	
-	
+
+
 	@Autowired private ReferenceNumberService referenceNumberService;
-	
-	 @PersistenceContext
-	 private EntityManager entityManager;
-	
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
 	@Override
-	public ResponseDTO createMemorandum(MemorandumDTO memorandumDTO) 
+	public ResponseDTO createMemorandum(MemorandumDTO memorandumDTO)
 	{
-		MemorandumEntity entity = null;
+		MemorandumEntity entity = memorandumDTO.getMemorandumId() != null
+				? memorandumRepository.getMemorandumById(memorandumDTO.getMemorandumId())
+				: null;
 		ResponseDTO responseDTO;
-		//try 
-		//{
+		if (entity == null) {
 			entity = new MemorandumEntity();
-			//entity.setCheckerEIN(memorandumDTO.getCheckerEIN());
-			entity.setCommitteeName(memorandumDTO.getCommitteeName());
-			
-			entity.setCommonOutwardNumber(memorandumDTO.getCommonOutwardNumber());
-			entity.setDateOfMeeting(memorandumDTO.getDateOfMeeting());
-			entity.setDetails(memorandumDTO.getDetails());
-			entity.setMemorandumDate(memorandumDTO.getMemorandumDate());
-			entity.setMemorandumTo(memorandumDTO.getMemorandumTo());
-			entity.setRemarks(memorandumDTO.getRemarks());
 			entity.setCreatedOn(LocalDate.now());
-			entity.setReceiptName(memorandumDTO.getReceiptName());
-			entity.setStatus(memorandumDTO.getStatus()); //DRAFT, PENDING
-			entity.setTitle(memorandumDTO.getTitle());
-			entity.setMakerEIN(memorandumDTO.getMakerEIN());
-			entity.setMakerName(memorandumDTO.getMakerName());
-			entity.setCheckerEIN(memorandumDTO.getCheckerEIN());
-			entity.setCheckerName(memorandumDTO.getCheckerName());
-			entity.setIsActive(true);
-			entity.setDepartmentId(memorandumDTO.getDepartmentId());
-			entity.setDepartmentName(memorandumDTO.getDepartmentName());
-			entity.setCommitteeId(memorandumDTO.getCommitteeId());
-			//entity.setCommitteeName(null);
-			
-//			entity.setReferenceNo(referenceNumberService.generateReferenceNumber(memorandumDTO.getDepartmentId(), 
-//																				memorandumDTO.getDepartmentName(), 
-//																				memorandumDTO.getCommitteeId(), 
-//																				memorandumDTO.getCommitteeName(), 
-//																				memorandumDTO.getMemorandumDate()));
-			
 			entity.setReferenceNo(null);
-			
-			memorandumRepository.save(entity);
-			responseDTO = new ResponseDTO ();
-			responseDTO.setMemorandumNumber(entity.getReferenceNo());
-			responseDTO.setMessage("Memorandum created");
-			responseDTO.setStatus("200");
-			
-//		}
-//		catch(Exception ex)
-//		{
-//			ex.printStackTrace();
-//			
-//			resonseDTO = new ResponseDTO ();
-//			resonseDTO.setMemorandumNumber(entity.getReferenceNo());
-//			resonseDTO.setMessage("Error occured while creating the memorandum");
-//		}
-		
+		}
+		entity.setCheckerEIN(memorandumDTO.getCheckerEIN());
+		entity.setCommitteeName(memorandumDTO.getCommitteeName());
+
+		entity.setCommonOutwardNumber(memorandumDTO.getCommonOutwardNumber());
+		entity.setDateOfMeeting(memorandumDTO.getDateOfMeeting());
+		entity.setDetails(memorandumDTO.getDetails());
+		entity.setMemorandumDate(
+				memorandumDTO.getMemorandumDate() != null
+						? memorandumDTO.getMemorandumDate()
+						: memorandumDTO.getDateOfDocument()
+		);
+		entity.setMemorandumTo(memorandumDTO.getMemorandumTo());
+		entity.setRemarks(memorandumDTO.getRemarks());
+		entity.setReceiptName(memorandumDTO.getReceiptName());
+		entity.setStatus(memorandumDTO.getStatus()); //DRAFT, PENDING
+		entity.setTitle(memorandumDTO.getTitle());
+		entity.setMakerEIN(memorandumDTO.getMakerEIN());
+		entity.setMakerName(memorandumDTO.getMakerName());
+		entity.setCheckerEIN(memorandumDTO.getCheckerEIN());
+		entity.setCheckerName(memorandumDTO.getCheckerName());
+		entity.setIsActive(true);
+		entity.setDepartmentId(memorandumDTO.getDepartmentId());
+		entity.setDepartmentName(memorandumDTO.getDepartmentName());
+		entity.setCommitteeId(memorandumDTO.getCommitteeId());
+
+		memorandumRepository.save(entity);
+		responseDTO = new ResponseDTO ();
+		responseDTO.setMemorandumNumber(entity.getReferenceNo());
+		responseDTO.setMessage(memorandumDTO.getMemorandumId() != null ? "Memorandum updated" : "Memorandum created");
+		responseDTO.setStatus("200");
+		System.out.println("DTO CHECKER EIN: " + memorandumDTO.getCheckerEIN());
+
 		return responseDTO;
 	}
 
 	@Override
-	public ResponseDTO updateStatus(WorkflowDTO workflowDTO) 
+	public ResponseDTO updateStatus(WorkflowDTO workflowDTO)
 	{
 		ResponseDTO responseDTO = null;
 		MemorandumEntity entity = memorandumRepository.getMemorandumById(workflowDTO.getMemorandumId());
-		if(workflowDTO.getStatus().equalsIgnoreCase("APPROVED"))
+		if (workflowDTO.getStatus().equalsIgnoreCase("APPROVED")
+				&& entity.getReferenceNo() == null)
 		{
-			entity.setReferenceNo(referenceNumberService.generateReferenceNumber(entity.getDepartmentId(), 
-					entity.getDepartmentName(), 
-					entity.getCommitteeId(), 
-					entity.getCommitteeName(), 
-				    entity.getMemorandumDate()));
+			entity.setReferenceNo(
+					referenceNumberService.generateReferenceNumber(
+							"MEMORANDUM",
+							entity.getDepartmentId(),
+							entity.getDepartmentName(),
+							entity.getCommitteeId(),
+							entity.getCommitteeName(),
+							entity.getMemorandumDate()
+					)
+			);
 		}
 		entity.setRejectionRemarks(workflowDTO.getRejectionRemarks());
 		entity.setStatus(workflowDTO.getStatus());
@@ -112,12 +107,12 @@ public class MemorandumServiceImpl implements MemorandumRestService
 		responseDTO.setMessage("Memorandum has been "+workflowDTO.getStatus());
 		responseDTO.setStatus("200");
 		responseDTO.setMemorandumNumber(entity.getReferenceNo());
-		
+
 		return responseDTO;
 	}
 
 	@Override
-	public ResponseDTO updateMemorandum(MemorandumDTO memorandumDTO) 
+	public ResponseDTO updateMemorandum(MemorandumDTO memorandumDTO)
 	{
 		ResponseDTO responseDTO = null;
 		MemorandumEntity entity = memorandumRepository.getMemorandumById(memorandumDTO.getMemorandumId());
@@ -128,87 +123,106 @@ public class MemorandumServiceImpl implements MemorandumRestService
 		responseDTO.setMessage("Memorandum has been Updated");
 		responseDTO.setStatus("200");
 		responseDTO.setMemorandumNumber(entity.getReferenceNo());
-		
+
 		return responseDTO;
 	}
 
 	@Override
 	public MemorandumDTO getMemorandum(SearchFilterDTO serchFilterDTO) {
 
-	    MemorandumEntity entity =
-	            memorandumRepository.getMemorandumById(
-	                    Long.valueOf(serchFilterDTO.getId()));
+		MemorandumEntity entity =
+				memorandumRepository.getMemorandumById(
+						Long.valueOf(serchFilterDTO.getId()));
 
-	    if (entity == null) {
-	        throw new RuntimeException("Memorandum not found");
-	    }
+		if (entity == null) {
+			throw new RuntimeException("Memorandum not found");
+		}
 
-	    MemorandumDTO dto = new MemorandumDTO();
-	    BeanUtils.copyProperties(entity, dto);
+		MemorandumDTO dto = new MemorandumDTO();
+		BeanUtils.copyProperties(entity, dto);
 
-	    return dto;
+		return dto;
 	}
 
-	
+
 	@Override
 	public List<MemorandumDTO> getMemorandumList(SearchFilterDTO dto) {
 
-	    String jpql = "FROM MemorandumEntity e WHERE e.isActive = true";
+		String jpql = "FROM MemorandumEntity e WHERE e.isActive = true";
+		String dateFilter = dto.getDateOfMemorandum() != null
+				? dto.getDateOfMemorandum()
+				: dto.getDateOfDocument();
 
-	    if (dto.getMemorandumTo() != null)
-	        jpql += " AND e.memorandumTo = :memorandumTo";
+		if (dto.getMemorandumTo() != null)
+			jpql += " AND e.memorandumTo = :memorandumTo";
 
-	    if (dto.getCommitteeName() != null)
-	        jpql += " AND e.committeeName = :committeeName";
-	    if (dto.getDepartmentName() != null)
-	        jpql += " AND e.departmentName = :departmentName";
-	    
+		if (dto.getCommitteeName() != null)
+			jpql += " AND e.committeeName = :committeeName";
+		if (dto.getDepartmentName() != null)
+			jpql += " AND e.departmentName = :departmentName";
 
-	    if (dto.getCheckerEin() != null)
-	        jpql += " AND e.checkerEIN = :checkerEin";
 
-	    if (dto.getStatus() != null)
-	        jpql += " AND e.status = :status";
+		if (dto.getCheckerEin() != null)
+			jpql += " AND e.checkerEIN = :checkerEin";
 
-	    if (dto.getTitle() != null)
-	        jpql += " AND LOWER(e.title) LIKE :title";
+		if (dto.getMakerEin() != null)
+			jpql += " AND e.makerEIN = :makerEin";
 
-	    if (dto.getReferenceNo() != null)
-	        jpql += " AND e.referenceNo LIKE :referenceNo";
+		if (dto.getStatus() != null)
+			jpql += " AND e.status = :status";
 
-	    TypedQuery<MemorandumEntity> query =
-	            entityManager.createQuery(jpql, MemorandumEntity.class);
+		if (dto.getTitle() != null)
+			jpql += " AND LOWER(e.title) LIKE :title";
 
-	    if (dto.getMemorandumTo() != null)
-	        query.setParameter("memorandumTo", dto.getMemorandumTo());
+		if (dto.getReferenceNo() != null)
+			jpql += " AND e.referenceNo LIKE :referenceNo";
 
-	    if (dto.getCommitteeName() != null)
-	        query.setParameter("committeeName", dto.getCommitteeName());
-	    if (dto.getDepartmentName() != null)
-	        query.setParameter("departmentName", dto.getDepartmentName());
+		if (dateFilter != null)
+			jpql += " AND e.memorandumDate = :documentDate";
 
-	    if (dto.getCheckerEin() != null)
-	        query.setParameter("checkerEin", dto.getCheckerEin());
+		TypedQuery<MemorandumEntity> query =
+				entityManager.createQuery(jpql, MemorandumEntity.class);
 
-	    if (dto.getStatus() != null)
-	        query.setParameter("status", dto.getStatus());
+		if (dto.getMemorandumTo() != null)
+			query.setParameter("memorandumTo", dto.getMemorandumTo());
 
-	    if (dto.getTitle() != null)
-	        query.setParameter("title", "%" + dto.getTitle().toLowerCase() + "%");
+		if (dto.getCommitteeName() != null)
+			query.setParameter("committeeName", dto.getCommitteeName());
+		if (dto.getDepartmentName() != null)
+			query.setParameter("departmentName", dto.getDepartmentName());
 
-	    if (dto.getReferenceNo() != null)
-	        query.setParameter("referenceNo", "%" + dto.getReferenceNo() + "%");
+		if (dto.getCheckerEin() != null)
+			query.setParameter("checkerEin", dto.getCheckerEin());
 
-	    return query.getResultList()
-	            .stream()
-	            .map(entity -> {
-	                MemorandumDTO m = new MemorandumDTO();
-	                BeanUtils.copyProperties(entity, m);
-	                return m;
-	            })
-	            .toList();
+		if (dto.getMakerEin() != null)
+			query.setParameter("makerEin", dto.getMakerEin());
+
+		if (dto.getStatus() != null)
+			query.setParameter("status", dto.getStatus());
+
+		if (dto.getTitle() != null)
+			query.setParameter("title", "%" + dto.getTitle().toLowerCase() + "%");
+
+		if (dto.getReferenceNo() != null)
+			query.setParameter("referenceNo", "%" + dto.getReferenceNo() + "%");
+
+		if (dateFilter != null)
+			query.setParameter("documentDate", LocalDate.parse(dateFilter));
+		return query.getResultList()
+				.stream()
+				.map(entity -> {
+					MemorandumDTO m = new MemorandumDTO();
+					BeanUtils.copyProperties(entity, m);
+
+					// 🔴 ADD THIS LINE
+					m.setMemorandumDate(entity.getMemorandumDate());
+
+					return m;
+				})
+				.toList();
 	}
 
 
 
 }
+

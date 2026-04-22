@@ -10,9 +10,11 @@ import java.util.Optional;
 public interface MemoSequenceRepository extends JpaRepository<MemoSequenceEntity, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<MemoSequenceEntity> findByDepartmentIdAndCommitteeIdAndFinancialYear(
+    Optional<MemoSequenceEntity>
+    findByDepartmentIdAndCommitteeIdAndDocumentTypeAndFinancialYear(
             Long departmentId,
             Long committeeId,
+            String documentType,
             String financialYear
     );
 }

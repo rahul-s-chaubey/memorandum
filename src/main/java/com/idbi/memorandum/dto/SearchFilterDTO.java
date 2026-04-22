@@ -1,38 +1,52 @@
 package com.idbi.memorandum.dto;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class SearchFilterDTO implements Serializable
 {
 
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 	private Integer id;  //this could be memorandumId, departmentId or committeeId
-	
+
 	private String memorandumTo;
-	
+
 	private String committeeName;
-	
+
 	private String checkerEin;
-	
+
 	private String makerEin;
-	
+
 	private String status;
-	
+
 	private String title;
-	
+
 	private String referenceNo;
-	
+
 	private String dateOfMemorandum;
-	
+
+	private String dateOfDocument;
+
 	private String departmentName;
-	
+
 	private Long committeeId;
-	
+
 	private Long departmentId;
-	
+
 	private Long solId;
-	
+
 	private String committeeType;
+
+	private String documentType;
+
+	public String getDocumentType() {
+		return documentType;
+	}
+
+	public void setDocumentType(String documentType) {
+		this.documentType = documentType;
+	}
 
 	public Integer getId() {
 		return id;
@@ -106,6 +120,14 @@ public class SearchFilterDTO implements Serializable
 		this.dateOfMemorandum = dateOfMemorandum;
 	}
 
+	public String getDateOfDocument() {
+		return dateOfDocument;
+	}
+
+	public void setDateOfDocument(String dateOfDocument) {
+		this.dateOfDocument = dateOfDocument;
+	}
+
 	public String getDepartmentName() {
 		return departmentName;
 	}
@@ -146,6 +168,6 @@ public class SearchFilterDTO implements Serializable
 		this.committeeType = committeeType;
 	}
 
-	
-	
+
+
 }

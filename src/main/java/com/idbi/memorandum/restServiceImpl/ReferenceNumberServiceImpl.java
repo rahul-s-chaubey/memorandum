@@ -1,72 +1,108 @@
 package com.idbi.memorandum.restServiceImpl;
 
-
 import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.idbi.memorandum.entities.MemoSequenceEntity;
 import com.idbi.memorandum.repositories.MemoSequenceRepository;
 import com.idbi.memorandum.restServices.ReferenceNumberService;
 
 @Service
-public class ReferenceNumberServiceImpl  implements ReferenceNumberService{
+public class ReferenceNumberServiceImpl implements ReferenceNumberService {
 
-    @Autowired private   MemoSequenceRepository sequenceRepository = null;
-
+    @Autowired
+    private MemoSequenceRepository sequenceRepository;
 
     @Override
     @Transactional
     public String generateReferenceNumber(
+            String documentType,
             Long departmentId,
             String departmentName,
             Long committeeId,
             String committeeName,
-            LocalDate memorandumDate
-    ) {
+            LocalDate documentDate) {
 
-        // 1) FY calculate
-        String financialYear = computeFinancialYear(memorandumDate);
+        String financialYear = computeFinancialYear(documentDate);
 
-        // 2) Existing sequence row lock + fetch
-        MemoSequenceEntity seq = sequenceRepository
-                .findByDepartmentIdAndCommitteeIdAndFinancialYear(
-                        departmentId, committeeId, financialYear
-                )
+        // Normalize blank to null
+        Long effectiveDepartmentId = departmentId;
+        Long effectiveCommitteeId = committeeId;
+
+        MemoSequenceEntity sequence = sequenceRepository
+                .findByDepartmentIdAndCommitteeIdAndDocumentTypeAndFinancialYear(
+                        effectiveDepartmentId,
+                        effectiveCommitteeId,
+                        documentType,
+                        financialYear)
                 .orElseGet(() -> {
-                    MemoSequenceEntity e = new MemoSequenceEntity();
-                    e.setDepartmentId(departmentId);
-                    e.setCommitteeId(committeeId);
-                    e.setFinancialYear(financialYear);
-                    e.setLastNumber(0);     // abhi tak koi memo nahi
-                    return e;
+                    MemoSequenceEntity newSeq = new MemoSequenceEntity();
+                    newSeq.setDepartmentId(effectiveDepartmentId);
+                    newSeq.setCommitteeId(effectiveCommitteeId);
+                    newSeq.setDocumentType(documentType);
+                    newSeq.setFinancialYear(financialYear);
+                    newSeq.setLastNumber(0);
+                    return newSeq;
                 });
 
-        // 3) Next number
-        int nextNumber = seq.getLastNumber() + 1;
-        seq.setLastNumber(nextNumber);
-        sequenceRepository.save(seq);       // same transaction
+        int nextNumber = sequence.getLastNumber() + 1;
+        sequence.setLastNumber(nextNumber);
+        sequenceRepository.save(sequence);
 
-        // 4) 2-digit formatting (01, 02, 03...)
-        String memoNumberFormatted = String.format("%02d", nextNumber);
+        String formattedNumber = String.format("%02d", nextNumber);
 
-        // 5) Final reference number
-        return "IDBI Bank / "
-                + departmentName
-                + " / "
-                + committeeName
-                + " / "
-                + memoNumberFormatted
-                + " / "
-                + financialYear;
+        return buildReferenceNumber(
+                documentType,
+                departmentName,
+                committeeName,
+                formattedNumber,
+                financialYear);
+    }
+
+    private String buildReferenceNumber(
+            String documentType,
+            String departmentName,
+            String committeeName,
+            String formattedNumber,
+            String financialYear) {
+
+        if ("MEMORANDUM".equalsIgnoreCase(documentType)) {
+            return "IDBI Bank / "
+                    + safe(departmentName) + " / "
+                    + safe(committeeName) + " / "
+                    + formattedNumber + " / "
+                    + financialYear;
+        }
+
+        if ("OFFICE_NOTE".equalsIgnoreCase(documentType)) {
+            return "IDBI Bank / OFFICE NOTE / "
+                    + formattedNumber + " / "
+                    + financialYear;
+        }
+
+        if ("OFFICIAL_LETTER".equalsIgnoreCase(documentType)) {
+            return "IDBI Bank / OFFICIAL LETTER / "
+                    + formattedNumber + " / "
+                    + financialYear;
+        }
+
+        throw new RuntimeException("Invalid Document Type");
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 
     private String computeFinancialYear(LocalDate date) {
         if (date == null) {
             date = LocalDate.now();
         }
+
         int year = date.getYear();
-        int month = date.getMonthValue(); // 1..12
+        int month = date.getMonthValue();
 
         if (month >= 4) {
             int next = (year + 1) % 100;
